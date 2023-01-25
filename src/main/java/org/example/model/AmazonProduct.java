@@ -2,14 +2,17 @@ package org.example.model;
 
 import lombok.Getter;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 @Getter
 public class AmazonProduct {
     private String brand;
+    private String model;
     private Price price;
 
     public AmazonProduct(Document document) {
         setBrand(document);
+        setModel(document);
         setPrice(document);
     }
 
@@ -20,6 +23,20 @@ public class AmazonProduct {
             brand = "";
         } else {
             brand = brandElements.get(0)
+                    .getElementsByTag("td")
+                    .get(1)
+                    .getElementsByTag("span")
+                    .text();
+        }
+    }
+
+    private void setModel(Document document) {
+        var modelElements = document.getElementsByClass("a-spacing-small po-model_name");
+        if (modelElements.isEmpty()) {
+            System.err.println("Unable to establish BRAND NAME for given product");
+            model = "";
+        } else {
+            model = modelElements.get(0)
                     .getElementsByTag("td")
                     .get(1)
                     .getElementsByTag("span")
@@ -57,7 +74,8 @@ public class AmazonProduct {
 
     @Override
     public String toString() {
-        return "brand='" + brand + '\'' +
+        return "brand='" + brand + "'" +
+                ", model='" + model + "'" +
                 ", price=" + price.value() +
                 ", currency=" + price.currency();
     }
